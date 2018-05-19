@@ -10,8 +10,9 @@ const numberTheme: ITheme = {
 
 /**
  * Generates deck of game cards from a theme
+ * @param theme
  */
-const makeCards: (theme: ITheme) => Card.Card[] = (theme: ITheme) => {
+const makeCards = (theme: ITheme) => {
 
     const deck: Card.Card[] = [];
 
@@ -32,7 +33,27 @@ const makeCards: (theme: ITheme) => Card.Card[] = (theme: ITheme) => {
     return deck;
 };
 
-const newDeck: Card.Card[] = makeCards(numberTheme);
+/**
+ * Randomize position of elements in an array
+ * Shuffle function from http://stackoverflow.com/a/2450976
+ * updated to es6
+ * @param any
+ */
+const shuffle = (array: any[]) => {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+};
+
+const newDeck: Card.Card[] = shuffle(makeCards(numberTheme));
 
 for (const card of newDeck) {
     console.log(`Here are the generated cards: , title: ${card.title}, html: ${card.html}`);
