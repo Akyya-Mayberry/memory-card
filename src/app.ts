@@ -3,7 +3,6 @@ import Card = require('./card');
 const container = document.getElementsByClassName('container')[0];
 const matchedCards: Set<string> = new Set([]);
 const facedUpCards: Set<Element> = new Set([]);
-
 const topTechTheme: ITheme = {
     name: 'Top Tech Companies',
     element: 'i',
@@ -12,6 +11,8 @@ const topTechTheme: ITheme = {
         'fab fa-microsoft', 'fab fa-linkedin-in'
     ]
 };
+const gameSize = topTechTheme.icons.length;
+let matchesMade = 0;
 
 /**
  * Generates deck of game cards from a theme
@@ -179,6 +180,9 @@ const isMatch = (element: any) => {
  * @param element
  */
 const confirmMatch = (element: any) => {
+    matchesMade += 1;
+    console.log(`match count: ${matchesMade}`);
+
     // Cards should be emptied from faced up list
     updateFaceUpCards('clear');
 
@@ -202,8 +206,18 @@ const failMatch = () => {
         facedUpCards.forEach((i) => {
             faceDown(i, i);
         });
-    }, 3000);
+    }, 2000);
 };
+
+/**
+ * Determines if user completed match game
+ */
+const isWinner = () => matchesMade === gameSize;
+
+/**
+ * Celebrate user winning card game
+ */
+const celebrate = () => console.log('Congratulations!!!!!');
 
 /**
  * Processes if a user made a valid match or not
@@ -225,6 +239,9 @@ const processMove = (event: any) => {
     if (isMatch(target)) {
         console.log(' a match!');
         confirmMatch(target);
+        if (isWinner()) {
+            celebrate();
+        }
     } else {
         console.log('no match');
         failMatch();
@@ -248,3 +265,4 @@ container.addEventListener('click', (event: any) => {
 
 const newDeck: Card.Card[] = shuffle(makeCards(topTechTheme));
 buildGameBoard(newDeck);
+console.log(`gameSize: ${gameSize}; matchesMade: ${matchesMade}`);
