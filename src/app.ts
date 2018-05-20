@@ -98,7 +98,8 @@ const isCardValid = (event: any) => {
         event === undefined ||
         event.target === null ||
         (event.target.classList.contains('match') || event.target.classList.contains('show')) ||
-        (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I')) {
+        (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I') ||
+        facedUpCards.size > 1) {
         console.log('validation failed!');
         return false;
     }
@@ -134,7 +135,7 @@ const updateFaceUpCards = (action: string, icon?: Element) => {
 };
 
 const isMatch = (target: any) => {
-    if (facedUpCards.size < 1) {return false};
+    if (facedUpCards.size < 1) {return false; }
 
     const card1: Element = facedUpCards.values().next().value;
 
@@ -166,7 +167,7 @@ const processMove = (event: any) => {
         return;
     } else {
         console.log('card exists. should try to match');
-
+        updateFaceUpCards('add', target);
         if (isMatch(target)) {
             console.log(' a match!');
             updateFaceUpCards('clear');
