@@ -92,11 +92,16 @@ const buildGameBoard = (deck: Card.Card[]) => {
     container.appendChild(fragHelper());
 };
 
+/**
+ * Determines if a card can be flipped over in UI
+ * @param event
+ */
 const isFlippable = (event: any) => {
     if (event === null ||
         event === undefined ||
         event.target === null ||
-        (event.target.classList.contains('match') || event.target.classList.contains('show')) ||
+        (event.target.classList.contains('match') ||
+            event.target.classList.contains('show')) ||
         (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I') ||
         facedUpCards.size > 1) {
 
@@ -107,6 +112,10 @@ const isFlippable = (event: any) => {
     return true;
 };
 
+/**
+ * Takes a card and flip it in UI and add it to faceup cards
+ * @param element
+ */
 const faceUp = (element: any) => {
     element.classList.add(...['open', 'show']);
     updateFaceUpCards('add', element);
@@ -114,6 +123,11 @@ const faceUp = (element: any) => {
     // TODO: Consider optimization - reduce number of reflows
 };
 
+/**
+ * Face card down in UI. Removes a single or all cards from faceup list.
+ * @param element
+ * @param icon
+ */
 const faceDown = (element: any, icon?: Element) => {
     element.classList.remove(...['open', 'show']);
 
@@ -126,6 +140,11 @@ const faceDown = (element: any, icon?: Element) => {
     */
 };
 
+/**
+ * Adds/Removes cards from faced up card list
+ * @param action
+ * @param icon
+ */
 const updateFaceUpCards = (action: string, icon?: Element) => {
     switch (action) {
         case 'add':
@@ -139,6 +158,10 @@ const updateFaceUpCards = (action: string, icon?: Element) => {
     }
 };
 
+/**
+ * Determine if cards in faced up card list match
+ * @param element
+ */
 const isMatch = (element: any) => {
     if (facedUpCards.size < 1) { return false; }
 
@@ -151,6 +174,10 @@ const isMatch = (element: any) => {
     return false;
 };
 
+/**
+ * Update the DOM to display two matching cards and removes them from faced up list
+ * @param element
+ */
 const confirmMatch = (element: any) => {
     // Cards should be emptied from faced up list
     updateFaceUpCards('clear');
@@ -166,6 +193,9 @@ const confirmMatch = (element: any) => {
     // TODO: Consider optimization - reduce number of reflows
 };
 
+/**
+ * Removes cards from faced up list
+ */
 const failMatch = () => {
     setTimeout(() => {
         // If no match we have to face the cards down
@@ -175,6 +205,10 @@ const failMatch = () => {
     }, 3000);
 };
 
+/**
+ * Processes if a user made a valid match or not
+ * @param event
+ */
 const processMove = (event: any) => {
     const target = event.target;
 
