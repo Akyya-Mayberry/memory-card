@@ -92,14 +92,14 @@ const buildGameBoard = (deck: Card.Card[]) => {
     container.appendChild(fragHelper());
 };
 
-const isCardValid = (event: any) => {
-    console.log('inside card validator. EventNodeName: ', event.target.nodeName);
+const isFlippable = (event: any) => {
     if (event === null ||
         event === undefined ||
         event.target === null ||
         (event.target.classList.contains('match') || event.target.classList.contains('show')) ||
         (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I') ||
         facedUpCards.size > 1) {
+
         console.log('validation failed!');
         return false;
     }
@@ -107,21 +107,26 @@ const isCardValid = (event: any) => {
     return true;
 };
 
-const faceUp = (target: any) => {
-    target.classList.add(...['open', 'show']);
+const faceUp = (element: any) => {
+    element.classList.add(...['open', 'show']);
+    updateFaceUpCards('add', element);
+
+    // TODO: Consider optimization - reduce number of reflows
 };
 
-// const faceDown = (target: any) => {
-//     const icon = target.firstChild.classList.value;
-//     console.log(`card dataAttr/Icon name: ${target.getAttribute('data-icon')}`);
-//     facedUpCards.delete(icon);
-//     target.classList.remove(['open', 'show']);
-// };
+const faceDown = (element: any, icon?: Element) => {
+    element.classList.remove(...['open', 'show']);
+
+    icon ? updateFaceUpCards('delete', icon) : updateFaceUpCards('clear');
+
+    /*
+    TODO:
+        Consider optimization - reduce number of reflows
+        Why two parameters - refactor this function
+    */
+};
 
 const updateFaceUpCards = (action: string, icon?: Element) => {
-    // const icon = target.firstChild.classList.value;
-    // console.log(`card dataAttr/Icon name: ${target.getAttribute('data-icon')}`);
-
     switch (action) {
         case 'add':
             if (icon) { facedUpCards.add(icon); }
@@ -134,16 +139,40 @@ const updateFaceUpCards = (action: string, icon?: Element) => {
     }
 };
 
-const isMatch = (target: any) => {
-    if (facedUpCards.size < 1) {return false; }
+const isMatch = (element: any) => {
+    if (facedUpCards.size < 1) { return false; }
 
     const card1: Element = facedUpCards.values().next().value;
 
-    if (card1.getAttribute('data-icon') === target.getAttribute('data-icon')) {
+    if (card1.getAttribute('data-icon') === element.getAttribute('data-icon')) {
         return true;
     }
 
     return false;
+};
+
+const confirmMatch = (element: any) => {
+    // Cards should be emptied from faced up list
+    updateFaceUpCards('clear');
+
+    // Find the card by their data attribute and add match class
+    const icon = `${element.getAttribute('data-icon')}`;
+    const matches = document.querySelectorAll(`li[data-icon*="${icon}"`);
+
+    matches.forEach((e: Element) => {
+        e.classList.add('match');
+    });
+
+    // TODO: Consider optimization - reduce number of reflows
+};
+
+const failMatch = () => {
+    setTimeout(() => {
+        // If no match we have to face the cards down
+        facedUpCards.forEach((i) => {
+            faceDown(i, i);
+        });
+    }, 3000);
 };
 
 const processMove = (event: any) => {
@@ -153,69 +182,29 @@ const processMove = (event: any) => {
     const icon = `${target.getAttribute('data-icon')}`;
 
     // Show the card
-    faceUp(target);
-    // updateFaceUpCards('add', icon);
+    faceUp(event.target);
 
-    // console log faced up cards
-    facedUpCards.forEach((i: Element) => {
-        console.log(`face up card: ${i}`);
-    });
+    // User is flipping first card
+    if (facedUpCards.size < 2) { return; }
 
-    // Check if it's a match
-    if (facedUpCards.size === 0) {
-        updateFaceUpCards('add', target);
-        return;
+    // Attempting to make a match
+    if (isMatch(target)) {
+        console.log(' a match!');
+        confirmMatch(target);
     } else {
-        console.log('card exists. should try to match');
-        updateFaceUpCards('add', target);
-        if (isMatch(target)) {
-            console.log(' a match!');
-            updateFaceUpCards('clear');
-            // If cards do match, loop over each one with
-            // data type of that icon and give it classname 'match
-        } else {
-
-            setTimeout(() => {
-                console.log('no match');
-                // If no match we have to face the cards down
-
-                const c: any[] = [];
-
-                facedUpCards.forEach((i) => {
-                    i.classList.remove(...['show', 'open']);
-                    // const e = document.querySelectorAll(`li[data-icon*="${i}"`);
-                    // c.push(...Array.from(e));
-                });
-                debugger;
-                target.classList.remove(...['show', 'open']);
-                console.log(`elements with matching data attributes to remove: ${Array.from(c)}`);
-
-                // const c: NodeList = document.querySelectorAll('li[data-icon*=".html');
-                // setTimeout(() => {
-                // for (const l of c) {
-                //     l.classList.remove(['show', 'open']);
-                //     console.log('l: ', l);
-                // }
-                // c.forEach((l) => {
-                //     console.log('l: ', l);
-                //     // l.classList.remove(['show', 'open']);
-                // });
-
-                console.log('');
-                updateFaceUpCards('clear');
-            }, 3000);
-        }
+        console.log('no match');
+        failMatch();
     }
 
-    // stop propogation
+    // TODO: consider event propagation
 };
 
 //////////////////////////
 // Listeners
 container.addEventListener('click', (event: any) => {
 
-    // Validate element is card
-    if (!isCardValid(event)) { return; }
+    // Validate element is flippable
+    if (!isFlippable(event)) { return; }
 
     // Process user's move
     processMove(event);
@@ -225,7 +214,3 @@ container.addEventListener('click', (event: any) => {
 
 const newDeck: Card.Card[] = shuffle(makeCards(topTechTheme));
 buildGameBoard(newDeck);
-
-for (const card of newDeck) {
-    console.log(`Here are the generated cards: , title: ${card.title}, html: ${card.html}`);
-}
