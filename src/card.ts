@@ -1,4 +1,8 @@
-export class Card {
+enum FlippedCardsState {
+    Add, Delete, Clear
+}
+
+class Card {
     public readonly icon: string;
     public readonly html: string = 'li';
     public readonly dataAttr: string;
@@ -15,4 +19,4 @@ export class Card {
     }
 }
 
-// export { Card };
+export { Card, FlippedCardsState };

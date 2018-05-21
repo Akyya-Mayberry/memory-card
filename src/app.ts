@@ -1,4 +1,4 @@
-import Card = require('./card');
+import { Card, FlippedCardsState } from './card';
 import { topTechTheme } from './themes';
 
 const container = document.getElementsByClassName('container')[0];
@@ -13,16 +13,16 @@ let matchesMade = 0;
  */
 const makeCards = (t: ITheme) => {
 
-    const deck: Card.Card[] = [];
+    const deck: Card[] = [];
 
     for (const index of t.icons.keys()) {
         const newCards = [
-            new Card.Card(
+            new Card(
                 t.icons[index],
                 t.name,
                 new Set(['card'])
             ),
-            new Card.Card(
+            new Card(
                 t.icons[index],
                 t.name,
                 new Set(['card'])
@@ -58,7 +58,7 @@ const shuffle = (array: any[]) => {
  * Makes a gameboard in the DOM from a deck of cards
  * @param deck
  */
-const buildGameBoard = (deck: Card.Card[]) => {
+const buildGameBoard = (deck: Card[]) => {
 
     const fragHelper = () => {
         const frag = document.createDocumentFragment();
@@ -72,7 +72,6 @@ const buildGameBoard = (deck: Card.Card[]) => {
 
             li.classList.add(...card.classes.values());
             li.setAttribute('data-icon', card.icon);
-            // li.classList.add('match');
             icon.classList.add(...card.icon.split(' '));
             li.appendChild(icon);
 
@@ -112,7 +111,7 @@ const isFlippable = (event: any) => {
  */
 const faceCardUp = (element: any) => {
     element.classList.add(...['open', 'show']);
-    updateFaceUpCards('add', element);
+    updateFaceUpCards(FlippedCardsState.Add, element);
 
     /*
         TODO: Consider optimization - reduce number of reflows
@@ -127,7 +126,7 @@ const faceCardUp = (element: any) => {
 const faceDown = (element: any, icon?: Element) => {
     element.classList.remove(...['open', 'show']);
 
-    icon ? updateFaceUpCards('delete', icon) : updateFaceUpCards('clear');
+    icon ? updateFaceUpCards(FlippedCardsState.Delete, icon) : updateFaceUpCards(FlippedCardsState.Clear);
 
     /*
     TODO:
@@ -141,15 +140,15 @@ const faceDown = (element: any, icon?: Element) => {
  * @param action
  * @param icon
  */
-const updateFaceUpCards = (action: string, icon?: Element) => {
+const updateFaceUpCards = (action: FlippedCardsState, icon?: Element) => {
     switch (action) {
-        case 'add':
+        case FlippedCardsState.Add:
             if (icon) { facedUpCards.add(icon); }
             break;
-        case 'clear':
+        case FlippedCardsState.Clear:
             facedUpCards.clear();
             break;
-        case 'delete':
+        case FlippedCardsState.Delete:
             if (icon) { facedUpCards.delete(icon); }
     }
 };
@@ -178,7 +177,7 @@ const confirmMatch = (element: any) => {
     matchesMade += 1;
 
     // Cards should be emptied from faced up list
-    updateFaceUpCards('clear');
+    updateFaceUpCards(FlippedCardsState.Clear);
 
     // Find the card by their data attribute and add match class
     const icon = `${element.getAttribute('data-icon')}`;
@@ -258,6 +257,6 @@ container.addEventListener('click', (event: any) => {
 
 //////////////////////////
 
-const newDeck: Card.Card[] = shuffle(makeCards(theme));
+const newDeck: Card[] = shuffle(makeCards(theme));
 buildGameBoard(newDeck);
 console.log(`gameSize: ${gameSize}; matchesMade: ${matchesMade}`);
