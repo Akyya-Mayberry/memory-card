@@ -1,9 +1,9 @@
 import { Card, FlippedCardsState } from './card';
-import { topTechTheme } from './themes';
+import { topTechTheme, udacityTheme } from './themes';
 
 const container = document.getElementsByClassName('container')[0];
 const facedUpCards: Set<Element> = new Set([]);
-const theme = topTechTheme;
+const theme = udacityTheme;
 const gameSize = theme.icons.length;
 let matches = 0;
 let moves = 0;
@@ -221,7 +221,6 @@ const celebrate = () => console.log(`Congratulations!!!!! You won in ${moves} mo
 const processMove = (event: any) => {
     const target = event.target;
 
-    // Show the card
     faceCardUp(event.target);
 
     // User is flipping first card

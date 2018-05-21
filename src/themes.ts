@@ -7,4 +7,13 @@ const topTechTheme: ITheme = {
     ]
 };
 
-export { topTechTheme };
+const udacityTheme: ITheme = {
+    name: 'Udacity Theme',
+    element: 'i',
+    icons: ['far fa-gem', 'fas fa-plane', 'fa fa-anchor',
+        'fa fa-bolt', 'fa fa-cube', 'fa fa-leaf',
+        'fa fa-bicycle', 'fa fa-bomb'
+    ]
+};
+
+export { topTechTheme, udacityTheme };
