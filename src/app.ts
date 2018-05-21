@@ -1,37 +1,30 @@
 import Card = require('./card');
+import { topTechTheme } from './themes';
 
 const container = document.getElementsByClassName('container')[0];
-const matchedCards: Set<string> = new Set([]);
 const facedUpCards: Set<Element> = new Set([]);
-const topTechTheme: ITheme = {
-    name: 'Top Tech Companies',
-    element: 'i',
-    icons: ['fab fa-amazon', 'fab fa-google', 'fab fa-facebook-f',
-        'fab fa-apple', 'fab fa-slack-hash', 'fab fa-github',
-        'fab fa-microsoft', 'fab fa-linkedin-in'
-    ]
-};
-const gameSize = topTechTheme.icons.length;
+const theme = topTechTheme;
+const gameSize = theme.icons.length;
 let matchesMade = 0;
 
 /**
  * Generates deck of game cards from a theme
  * @param theme
  */
-const makeCards = (theme: ITheme) => {
+const makeCards = (t: ITheme) => {
 
     const deck: Card.Card[] = [];
 
-    for (const index of theme.icons.keys()) {
+    for (const index of t.icons.keys()) {
         const newCards = [
             new Card.Card(
-                topTechTheme.icons[index],
-                topTechTheme.name,
+                t.icons[index],
+                t.name,
                 new Set(['card'])
             ),
             new Card.Card(
-                topTechTheme.icons[index],
-                topTechTheme.name,
+                t.icons[index],
+                t.name,
                 new Set(['card'])
             )
         ];
@@ -75,7 +68,7 @@ const buildGameBoard = (deck: Card.Card[]) => {
         // Create DOM elements from the cards
         for (const card of deck) {
             const li = document.createElement(card.html);
-            const icon = document.createElement(topTechTheme.element);
+            const icon = document.createElement(theme.element);
 
             li.classList.add(...card.classes.values());
             li.setAttribute('data-icon', card.icon);
@@ -117,11 +110,13 @@ const isFlippable = (event: any) => {
  * Takes a card and flip it in UI and add it to faceup cards
  * @param element
  */
-const faceUp = (element: any) => {
+const faceCardUp = (element: any) => {
     element.classList.add(...['open', 'show']);
     updateFaceUpCards('add', element);
 
-    // TODO: Consider optimization - reduce number of reflows
+    /*
+        TODO: Consider optimization - reduce number of reflows
+    */
 };
 
 /**
@@ -181,7 +176,6 @@ const isMatch = (element: any) => {
  */
 const confirmMatch = (element: any) => {
     matchesMade += 1;
-    console.log(`match count: ${matchesMade}`);
 
     // Cards should be emptied from faced up list
     updateFaceUpCards('clear');
@@ -194,7 +188,9 @@ const confirmMatch = (element: any) => {
         e.classList.add('match');
     });
 
-    // TODO: Consider optimization - reduce number of reflows
+    /*
+        TODO: Consider optimization - reduce number of reflows
+    */
 };
 
 /**
@@ -226,11 +222,8 @@ const celebrate = () => console.log('Congratulations!!!!!');
 const processMove = (event: any) => {
     const target = event.target;
 
-    // Get the card type
-    const icon = `${target.getAttribute('data-icon')}`;
-
     // Show the card
-    faceUp(event.target);
+    faceCardUp(event.target);
 
     // User is flipping first card
     if (facedUpCards.size < 2) { return; }
@@ -247,7 +240,9 @@ const processMove = (event: any) => {
         failMatch();
     }
 
-    // TODO: consider event propagation
+    /*
+        TODO: consider event propagation
+    */
 };
 
 //////////////////////////
@@ -263,6 +258,6 @@ container.addEventListener('click', (event: any) => {
 
 //////////////////////////
 
-const newDeck: Card.Card[] = shuffle(makeCards(topTechTheme));
+const newDeck: Card.Card[] = shuffle(makeCards(theme));
 buildGameBoard(newDeck);
 console.log(`gameSize: ${gameSize}; matchesMade: ${matchesMade}`);
