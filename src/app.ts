@@ -5,7 +5,8 @@ const container = document.getElementsByClassName('container')[0];
 const facedUpCards: Set<Element> = new Set([]);
 const theme = topTechTheme;
 const gameSize = theme.icons.length;
-let matchesMade = 0;
+let matches = 0;
+let moves = 0;
 
 /**
  * Generates deck of game cards from a theme
@@ -98,7 +99,6 @@ const isFlippable = (event: any) => {
         (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I') ||
         facedUpCards.size > 1) {
 
-        console.log('validation failed!');
         return false;
     }
 
@@ -174,16 +174,16 @@ const isMatch = (element: any) => {
  * @param element
  */
 const confirmMatch = (element: any) => {
-    matchesMade += 1;
+    matches += 1;
 
     // Cards should be emptied from faced up list
     updateFaceUpCards(FlippedCardsState.Clear);
 
     // Find the card by their data attribute and add match class
     const icon = `${element.getAttribute('data-icon')}`;
-    const matches = document.querySelectorAll(`li[data-icon*="${icon}"`);
+    const elements = document.querySelectorAll(`li[data-icon*="${icon}"`);
 
-    matches.forEach((e: Element) => {
+    elements.forEach((e: Element) => {
         e.classList.add('match');
     });
 
@@ -207,12 +207,12 @@ const failMatch = () => {
 /**
  * Determines if user completed match game
  */
-const isWinner = () => matchesMade === gameSize;
+const isWinner = () => matches === gameSize;
 
 /**
  * Celebrate user winning card game
  */
-const celebrate = () => console.log('Congratulations!!!!!');
+const celebrate = () => console.log(`Congratulations!!!!! You won in ${moves} moves`);
 
 /**
  * Processes if a user made a valid match or not
@@ -228,14 +228,14 @@ const processMove = (event: any) => {
     if (facedUpCards.size < 2) { return; }
 
     // Attempting to make a match
+    moves += 1;
+
     if (isMatch(target)) {
-        console.log(' a match!');
         confirmMatch(target);
         if (isWinner()) {
             celebrate();
         }
     } else {
-        console.log('no match');
         failMatch();
     }
 
@@ -259,4 +259,3 @@ container.addEventListener('click', (event: any) => {
 
 const newDeck: Card[] = shuffle(makeCards(theme));
 buildGameBoard(newDeck);
-console.log(`gameSize: ${gameSize}; matchesMade: ${matchesMade}`);
