@@ -2,7 +2,7 @@ import { Card, FlippedCardsState } from './card';
 import { topTechTheme, udacityTheme } from './themes';
 
 const container = document.getElementsByClassName('container')[0];
-const facedUpCards: Set<Element> = new Set([]);
+const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
 const gameSize = theme.icons.length;
 let matches = 0;
@@ -20,13 +20,15 @@ const makeCards = (t: ITheme) => {
         const newCards = [
             new Card(
                 t.icons[index],
-                t.name,
-                new Set(['card'])
+                `${t.icons[index]}-${index}-1`,
+                new Set(['card']),
+                theme
             ),
             new Card(
                 t.icons[index],
-                t.name,
-                new Set(['card'])
+                `${t.icons[index]}-${index}-2`,
+                new Set(['card']),
+                theme
             )
         ];
 
@@ -68,15 +70,7 @@ const buildGameBoard = (deck: Card[]) => {
 
         // Create DOM elements from the cards
         for (const card of deck) {
-            const li = document.createElement(card.html);
-            const icon = document.createElement(theme.element);
-
-            li.classList.add(...card.classes.values());
-            li.setAttribute('data-icon', card.icon);
-            icon.classList.add(...card.icon.split(' '));
-            li.appendChild(icon);
-
-            ul.appendChild(li);
+            ul.appendChild(card.getHtml());
         }
 
         frag.appendChild(ul);
@@ -94,9 +88,9 @@ const isFlippable = (event: any) => {
     if (event === null ||
         event === undefined ||
         event.target === null ||
-        (event.target.classList.contains('match') ||
-            event.target.classList.contains('show')) ||
-        (event.target.nodeName !== 'LI' && event.target.nodeName !== 'I') ||
+        event.target.classList.contains('match') ||
+        event.target.classList.contains('show') ||
+        event.target.nodeName !== 'LI' ||
         facedUpCards.size > 1) {
 
         return false;
@@ -107,11 +101,13 @@ const isFlippable = (event: any) => {
 
 /**
  * Takes a card and flip it in UI and add it to faceup cards
- * @param element
+ * @param card
  */
-const faceCardUp = (element: any) => {
-    element.classList.add(...['open', 'show']);
-    updateFaceUpCards(FlippedCardsState.Add, element);
+const faceCardUp = (c: Card) => {
+
+    c.faceUp();
+
+    updateFaceUpCards(FlippedCardsState.Add, c);
 
     /*
         TODO: Consider optimization - reduce number of reflows
@@ -120,49 +116,48 @@ const faceCardUp = (element: any) => {
 
 /**
  * Face card down in UI. Removes a single or all cards from faceup list.
- * @param element
- * @param icon
+ * @param card
  */
-const faceDown = (element: any, icon?: Element) => {
-    element.classList.remove(...['open', 'show']);
+const faceDown = (card?: Card) => {
 
-    icon ? updateFaceUpCards(FlippedCardsState.Delete, icon) : updateFaceUpCards(FlippedCardsState.Clear);
+    if (card) { card.faceDown(); }
+
+    card ? updateFaceUpCards(FlippedCardsState.Delete, card) : updateFaceUpCards(FlippedCardsState.Clear);
 
     /*
     TODO:
         Consider optimization - reduce number of reflows
-        Why two parameters - refactor this function
     */
 };
 
 /**
  * Adds/Removes cards from faced up card list
  * @param action
- * @param icon
+ * @param card
  */
-const updateFaceUpCards = (action: FlippedCardsState, icon?: Element) => {
+const updateFaceUpCards = (action: FlippedCardsState, card?: Card) => {
     switch (action) {
         case FlippedCardsState.Add:
-            if (icon) { facedUpCards.add(icon); }
+            if (card) { facedUpCards.add(card); }
             break;
         case FlippedCardsState.Clear:
             facedUpCards.clear();
             break;
         case FlippedCardsState.Delete:
-            if (icon) { facedUpCards.delete(icon); }
+            if (card) { facedUpCards.delete(card); }
     }
 };
 
 /**
- * Determine if cards in faced up card list match
- * @param element
+ * Determine if cards in the facedup list of cards match
+ * @param card2
  */
-const isMatch = (element: any) => {
+const isMatch = (card2: Card) => {
     if (facedUpCards.size < 1) { return false; }
 
-    const card1: Element = facedUpCards.values().next().value;
+    const card1: Card = facedUpCards.values().next().value;
 
-    if (card1.getAttribute('data-icon') === element.getAttribute('data-icon')) {
+    if (card1.icon === card2.icon) {
         return true;
     }
 
@@ -171,16 +166,16 @@ const isMatch = (element: any) => {
 
 /**
  * Update the DOM to display two matching cards and removes them from faced up list
- * @param element
+ * @param card
  */
-const confirmMatch = (element: any) => {
+const confirmMatch = (card: Card) => {
     matches += 1;
 
     // Cards should be emptied from faced up list
     updateFaceUpCards(FlippedCardsState.Clear);
 
     // Find the card by their data attribute and add match class
-    const icon = `${element.getAttribute('data-icon')}`;
+    const icon = card.icon;
     const elements = document.querySelectorAll(`li[data-icon*="${icon}"`);
 
     elements.forEach((e: Element) => {
@@ -198,8 +193,8 @@ const confirmMatch = (element: any) => {
 const failMatch = () => {
     setTimeout(() => {
         // If no match we have to face the cards down
-        facedUpCards.forEach((i) => {
-            faceDown(i, i);
+        facedUpCards.forEach((c: Card) => {
+            faceDown(c);
         });
     }, 2000);
 };
@@ -220,8 +215,15 @@ const celebrate = () => console.log(`Congratulations!!!!! You won in ${moves} mo
  */
 const processMove = (event: any) => {
     const target = event.target;
+    const index = target.getAttribute('data-icon').split('-')[2];
 
-    faceCardUp(event.target);
+    const newCard = new Card(
+        theme.icons[index],
+        target.getAttribute('data-icon'),
+        new Set(target.classList),
+        theme);
+
+    faceCardUp(newCard);
 
     // User is flipping first card
     if (facedUpCards.size < 2) { return; }
@@ -229,8 +231,8 @@ const processMove = (event: any) => {
     // Attempting to make a match
     moves += 1;
 
-    if (isMatch(target)) {
-        confirmMatch(target);
+    if (isMatch(newCard)) {
+        confirmMatch(newCard);
         if (isWinner()) {
             celebrate();
         }
@@ -247,7 +249,7 @@ const processMove = (event: any) => {
 // Listeners
 container.addEventListener('click', (event: any) => {
 
-    // Validate element is flippable
+    // Validate card is flippable
     if (!isFlippable(event)) { return; }
 
     // Process user's move
