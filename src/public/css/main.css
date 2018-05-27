@@ -106,3 +106,9 @@ h1 {
     float: right;
     cursor: pointer;
 }
+
+.score-panel .timer {
+    /* display: inline-block; */
+    float: right;
+    width: 150px;
+}

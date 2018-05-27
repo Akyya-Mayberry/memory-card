@@ -42,15 +42,10 @@ class Card {
         e.classList.add(...['open', 'show']);
     }
 
-    /**
-     * Face card down in UI. Removes a single or all cards from faceup list.
-     * @param element
-     * @param icon
-     */
     public faceDown = () => {
         this.classes.delete('open');
         this.classes.delete('show');
-
+ 
         const e: Element = document.querySelector(`li[data-icon*="${this.dataAttr}"`)!;
 
         e.classList.remove(...['open', 'show']);

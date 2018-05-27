@@ -1,10 +1,13 @@
 import { Card, FlippedCardsState } from './card';
 import { topTechTheme, udacityTheme } from './themes';
+import { Timer } from './timer';
 
 const container = document.getElementsByClassName('container')[0];
 const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
 const gameSize = theme.icons.length;
+const timer = new Timer();
+let isTimerRunning = false;
 let matches = 0;
 let moves = 0;
 
@@ -118,11 +121,11 @@ const faceCardUp = (c: Card) => {
  * Face card down in UI. Removes a single or all cards from faceup list.
  * @param card
  */
-const faceDown = (card?: Card) => {
+const faceDown = (c?: Card) => {
 
-    if (card) { card.faceDown(); }
+    if (c) { c.faceDown(); }
 
-    card ? updateFaceUpCards(FlippedCardsState.Delete, card) : updateFaceUpCards(FlippedCardsState.Clear);
+    c ? updateFaceUpCards(FlippedCardsState.Delete, c) : updateFaceUpCards(FlippedCardsState.Clear);
 
     /*
     TODO:
@@ -191,12 +194,12 @@ const confirmMatch = (card: Card) => {
  * Removes cards from faced up list
  */
 const failMatch = () => {
-    setTimeout(() => {
         // If no match we have to face the cards down
-        facedUpCards.forEach((c: Card) => {
+    facedUpCards.forEach((c: Card) => {
+        setTimeout(() => {
             faceDown(c);
-        });
-    }, 2000);
+        }, 2000);
+    });
 };
 
 /**
@@ -207,7 +210,11 @@ const isWinner = () => matches === gameSize;
 /**
  * Celebrate user winning card game
  */
-const celebrate = () => console.log(`Congratulations!!!!! You won in ${moves} moves`);
+const celebrate = () => {
+    console.log(`Congratulations!!!!! You won in ${moves} moves`);
+    timer.stop();
+    isTimerRunning = false;
+};
 
 /**
  * Processes if a user made a valid match or not
@@ -233,9 +240,7 @@ const processMove = (event: any) => {
 
     if (isMatch(newCard)) {
         confirmMatch(newCard);
-        if (isWinner()) {
-            celebrate();
-        }
+        if (isWinner()) { celebrate(); }
     } else {
         failMatch();
     }
@@ -249,10 +254,13 @@ const processMove = (event: any) => {
 // Listeners
 container.addEventListener('click', (event: any) => {
 
-    // Validate card is flippable
     if (!isFlippable(event)) { return; }
 
-    // Process user's move
+    if (!isTimerRunning) {
+        timer.start(new Date());
+        isTimerRunning = true;
+    }
+
     processMove(event);
 });
 
