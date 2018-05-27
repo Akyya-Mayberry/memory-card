@@ -19,6 +19,10 @@ class Timer {
         this.stopTimer();
     }
 
+    public reset = () => {
+        this.resetTimer();
+    }
+
     private startTimer = () => {
         this.timerId = setInterval(() => {
 
@@ -42,6 +46,19 @@ class Timer {
 
     private stopTimer = () => {
         clearInterval(this.timerId);
+    }
+
+    private resetTimer = () => {
+        this.stopTimer();
+        this.seconds = 0;
+        this.minutes = 0;
+        this.hours = 0;
+        this.timerId = 0;
+        this.triggered = new Date();
+
+        this.s.textContent = '00';
+        this.h.textContent = '00';
+        this.m.textContent = '00';
     }
 }
 

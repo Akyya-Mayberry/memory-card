@@ -3,6 +3,7 @@ import { topTechTheme, udacityTheme } from './themes';
 import { Timer } from './timer';
 
 const container = document.getElementsByClassName('container')[0];
+const restart = document.getElementById('restart');
 const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
 const gameSize = theme.icons.length;
@@ -181,9 +182,9 @@ const confirmMatch = (card: Card) => {
     const icon = card.icon;
     const elements = document.querySelectorAll(`li[data-icon*="${icon}"`);
 
-    elements.forEach((e: Element) => {
+    for (const e of elements) {
         e.classList.add('match');
-    });
+    }
 
     /*
         TODO: Consider optimization - reduce number of reflows
@@ -214,6 +215,41 @@ const celebrate = () => {
     console.log(`Congratulations!!!!! You won in ${moves} moves`);
     timer.stop();
     isTimerRunning = false;
+};
+
+/**
+ * Reset the game timer
+ */
+const resetTimer = () => {
+    isTimerRunning = false;
+    timer.reset();
+};
+
+/**
+ * Restarts the game from the beginning
+ */
+const restartGame = () => {
+    // Restart Timer and update the UI for it
+    resetTimer();
+
+    // Clear out faceup cards
+    facedUpCards.clear();
+
+    // Reintialized any needed variables
+    matches = 0;
+    moves = 0;
+
+    // Go through each card in the dom and reset classes
+    const elements = document.querySelectorAll('.card');
+
+    for (const e of elements) {
+        e.classList.remove(...['match', 'open', 'show']);
+    }
+
+    /*
+        TODO: Consider optimization - the for of loop above
+        will generate multiple reflows. Refactor this.
+    */
 };
 
 /**
@@ -262,6 +298,10 @@ container.addEventListener('click', (event: any) => {
     }
 
     processMove(event);
+});
+
+restart.addEventListener('click', () => {
+    restartGame();
 });
 
 //////////////////////////

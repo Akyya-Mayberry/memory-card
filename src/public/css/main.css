@@ -108,7 +108,9 @@ h1 {
 }
 
 .score-panel .timer {
-    /* display: inline-block; */
-    float: right;
+    display: inline-block;
+    /* text-align: right; */
+    /* float: right; */
+    margin-left: 15px;
     width: 150px;
 }
