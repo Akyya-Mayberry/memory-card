@@ -1,5 +1,4 @@
 import 'bootstrap';
-// import $ from 'jquery';
 import { Card, FlippedCardsState } from './card';
 import { topTechTheme, udacityTheme } from './themes';
 import { Timer } from './timer';
@@ -213,18 +212,32 @@ const failMatch = () => {
 const isWinner = () => matches === gameSize;
 
 /**
- * Celebrate user winning card game
+ * Returns a string representation of final game stats
  */
-const celebrate = () => {
-    console.log(`Congratulations!!!!! You won in ${moves} moves`);
-    timer.stop();
-    isTimerRunning = false;
+const getStats = () => {
+    if (isTimerRunning) { return; }
 
     const [h, m, s] = timer.getCurrentTime().split(':');
     const text = `You completed the game within ${moves} moves in ${h} hours,
         ${m} minutes and ${s} seconds.`;
+    return text;
 
-    gameStats.textContent = text;
+    /*
+        TODO: Right now only final stats returned.
+        Maybe adjust to return current stats too.
+    */
+};
+
+/**
+ * Celebrate user winning card game
+ */
+const celebrate = () => {
+    timer.stop();
+    isTimerRunning = false;
+
+    // Generate stats
+
+    gameStats.textContent = getStats();
 
     congratsModal.modal('show');
 };
@@ -316,12 +329,11 @@ restart.addEventListener('click', () => {
     restartGame();
 });
 
-$('#congratsModal').on('hidden.bs.modal', (e: Event) => {
-    console.log('#### should clear gameboard');
+$('#congratsModal').on('hidden.bs.modal', () => {
+    restartGame();
 });
 
 //////////////////////////
 
 const newDeck: Card[] = shuffle(makeCards(theme));
 buildGameBoard(newDeck);
-
