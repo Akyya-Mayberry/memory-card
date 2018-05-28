@@ -45,7 +45,7 @@ class Card {
     public faceDown = () => {
         this.classes.delete('open');
         this.classes.delete('show');
- 
+
         const e: Element = document.querySelector(`li[data-icon*="${this.dataAttr}"`)!;
 
         e.classList.remove(...['open', 'show']);

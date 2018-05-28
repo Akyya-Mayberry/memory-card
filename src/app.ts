@@ -1,9 +1,13 @@
+import 'bootstrap';
+// import $ from 'jquery';
 import { Card, FlippedCardsState } from './card';
 import { topTechTheme, udacityTheme } from './themes';
 import { Timer } from './timer';
 
-const container = document.getElementsByClassName('container')[0];
+const container = document.getElementById('container');
 const restart = document.getElementById('restart');
+const congratsModal = $('#congratsModal');
+const gameStats = document.getElementById('game-stats');
 const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
 const gameSize = theme.icons.length;
@@ -195,7 +199,7 @@ const confirmMatch = (card: Card) => {
  * Removes cards from faced up list
  */
 const failMatch = () => {
-        // If no match we have to face the cards down
+    // If no match we have to face the cards down
     facedUpCards.forEach((c: Card) => {
         setTimeout(() => {
             faceDown(c);
@@ -215,6 +219,14 @@ const celebrate = () => {
     console.log(`Congratulations!!!!! You won in ${moves} moves`);
     timer.stop();
     isTimerRunning = false;
+
+    const [h, m, s] = timer.getCurrentTime().split(':');
+    const text = `You completed the game within ${moves} moves in ${h} hours,
+        ${m} minutes and ${s} seconds.`;
+
+    gameStats.textContent = text;
+
+    congratsModal.modal('show');
 };
 
 /**
@@ -288,23 +300,28 @@ const processMove = (event: any) => {
 
 //////////////////////////
 // Listeners
-container.addEventListener('click', (event: any) => {
+container.addEventListener('click', (e: Event) => {
 
-    if (!isFlippable(event)) { return; }
+    if (!isFlippable(e)) { return; }
 
     if (!isTimerRunning) {
         timer.start(new Date());
         isTimerRunning = true;
     }
 
-    processMove(event);
+    processMove(e);
 });
 
 restart.addEventListener('click', () => {
     restartGame();
 });
 
+$('#congratsModal').on('hidden.bs.modal', (e: Event) => {
+    console.log('#### should clear gameboard');
+});
+
 //////////////////////////
 
 const newDeck: Card[] = shuffle(makeCards(theme));
 buildGameBoard(newDeck);
+
