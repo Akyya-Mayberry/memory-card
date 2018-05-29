@@ -35,7 +35,10 @@ class Card {
 
     public faceUp = () => {
         this.classes.add('open');
-        this.classes.add('reveal');
+
+        setTimeout(() => {
+            this.classes.add('reveal');
+        }, 1000);
 
         const e: Element = document.querySelector(`li[data-icon*="${this.dataAttr}"`)!;
 

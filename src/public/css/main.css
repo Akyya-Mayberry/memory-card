@@ -23,13 +23,6 @@ body {
     flex-direction: column;
 }
 
-.in-background {
-    color: red;
-    opacity: 0.3;
-    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-    filter: grayscale(100%);
-}
-
 h1 {
     /* font-family: 'Open Sans', sans-serif; */
     font-weight: 300;
@@ -74,13 +67,13 @@ h1 {
 }
 
 .deck .card.reveal {
-    font-size: 33px;
+    font-size: 50px;
 }
 
 .deck .card.match {
     cursor: default;
     background: #02ccba;
-    font-size: 33px;
+    font-size: 65px;
 }
 
 /*
