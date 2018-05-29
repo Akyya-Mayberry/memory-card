@@ -2,6 +2,17 @@ enum FlippedCardsState {
     Add, Delete, Clear
 }
 
+/**
+ * A series of cards make up a deck.
+ * Matching cards will have the same icon and a similar data attribute.
+ * The icon is what is dispay in the card.
+ * The data attribute is what allows the card to be distinguished in the DOM
+ * from the other cards. It is a dash dilimited string consisting of
+ * the cards icon, an index number and a trailing tag number.
+ * The index number links the card icon to a icon in the themes list of icons.
+ * The trailing tag number (1 or 2) is to distinguish matching cards from each other.
+ */
+
 class Card {
     public readonly icon: string;
     public readonly tag: string = 'li';
