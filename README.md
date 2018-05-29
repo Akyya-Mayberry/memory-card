@@ -45,4 +45,4 @@ These steps outline how to get the project setup in development using visual stu
 * Node
 
 # Acknowledgements
-The current user interface is based on the design here [find link]
+The current user interface is based on the design here *https://github.com/udacity/fend-project-memory-game*
