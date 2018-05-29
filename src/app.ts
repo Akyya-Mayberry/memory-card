@@ -1,9 +1,13 @@
+import 'bootstrap';
 import { Card, FlippedCardsState } from './card';
 import { topTechTheme, udacityTheme } from './themes';
 import { Timer } from './timer';
 
-const container = document.getElementsByClassName('container')[0];
+const container = document.getElementById('container');
 const restart = document.getElementById('restart');
+const congratsModal = $('#congratsModal');
+const starSelector = 'section.score-panel > ul > li > i';
+const gameStats = document.getElementById('game-stats');
 const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
 const gameSize = theme.icons.length;
@@ -71,6 +75,7 @@ const buildGameBoard = (deck: Card[]) => {
         const frag = document.createDocumentFragment();
         const ul = document.createElement('ul');
         ul.classList.add('deck');
+        ul.setAttribute('id', 'deck');
 
         // Create DOM elements from the cards
         for (const card of deck) {
@@ -195,7 +200,7 @@ const confirmMatch = (card: Card) => {
  * Removes cards from faced up list
  */
 const failMatch = () => {
-        // If no match we have to face the cards down
+    // If no match we have to face the cards down
     facedUpCards.forEach((c: Card) => {
         setTimeout(() => {
             faceDown(c);
@@ -209,12 +214,65 @@ const failMatch = () => {
 const isWinner = () => matches === gameSize;
 
 /**
+ * Returns a string representation of final game stats
+ */
+const getStats = () => {
+    if (isTimerRunning) { return; }
+
+    const [h, m, s] = timer.getCurrentTime().split(':');
+    const text = `You completed the game within ${moves} moves in ${h} hours,
+        ${m} minutes and ${s} seconds.`;
+    return text;
+
+    /*
+        TODO: Right now only final stats returned.
+        Maybe adjust to return current stats too.
+    */
+};
+
+/**
+ * Updates ratings in score panel based on current time
+ */
+const rate = () => {
+    const time = timer.getCurrentTime().split(':').join('');
+
+    let stars = document.querySelectorAll('section.score-panel > ul > li > i');
+
+    if (time < '000036') {
+        for (const star of stars) {
+            star.style.color = 'goldenrod';
+        }
+    } else if (time < '000051') {
+        stars[2].style.color = 'gainsboro';
+    } else if (time < '000100') {
+        stars[2].style.color = 'gainsboro';
+        stars[1].style.color = 'gainsboro';
+    } else {
+        for (const star of stars) {
+            star.style.color = 'gainsboro';
+        }
+    }
+
+    /*
+        TODO: Signal time points - since rating is based on time
+        and not move count, ratings should be updated when certain
+        time intervals hit. Send out events when time is over 30 seconds
+        etc so ratings will be updated then.
+    */
+};
+
+/**
  * Celebrate user winning card game
  */
 const celebrate = () => {
-    console.log(`Congratulations!!!!! You won in ${moves} moves`);
     timer.stop();
     isTimerRunning = false;
+
+    // Generate stats
+
+    gameStats.textContent = getStats();
+
+    congratsModal.modal('show');
 };
 
 /**
@@ -240,11 +298,27 @@ const restartGame = () => {
     moves = 0;
 
     // Go through each card in the dom and reset classes
-    const elements = document.querySelectorAll('.card');
+    // const elements = document.querySelectorAll('.card');
 
-    for (const e of elements) {
-        e.classList.remove(...['match', 'open', 'show']);
+    // for (const e of elements) {
+    //     e.classList.remove(...['match', 'open', 'show']);
+    // }
+
+    // Reset score panel
+    document.getElementsByClassName('moves')[0].textContent = moves;
+
+    let stars = document.querySelectorAll('section.score-panel > ul > li > i');
+    for (const star of stars) {
+        star.style.color = 'goldenrod';
     }
+
+    // Remove the board
+    const currentBoard = document.getElementById('deck');
+    currentBoard.parentNode.removeChild(currentBoard);
+
+    // Recreate
+    const deck: Card[] = shuffle(makeCards(theme));
+    buildGameBoard(deck);
 
     /*
         TODO: Consider optimization - the for of loop above
@@ -273,6 +347,7 @@ const processMove = (event: any) => {
 
     // Attempting to make a match
     moves += 1;
+    document.getElementsByClassName('moves')[0].textContent = moves;
 
     if (isMatch(newCard)) {
         confirmMatch(newCard);
@@ -281,6 +356,8 @@ const processMove = (event: any) => {
         failMatch();
     }
 
+    rate();
+
     /*
         TODO: consider event propagation
     */
@@ -288,19 +365,23 @@ const processMove = (event: any) => {
 
 //////////////////////////
 // Listeners
-container.addEventListener('click', (event: any) => {
+container.addEventListener('click', (e: Event) => {
 
-    if (!isFlippable(event)) { return; }
+    if (!isFlippable(e)) { return; }
 
     if (!isTimerRunning) {
         timer.start(new Date());
         isTimerRunning = true;
     }
 
-    processMove(event);
+    processMove(e);
 });
 
 restart.addEventListener('click', () => {
+    restartGame();
+});
+
+$('#congratsModal').on('hidden.bs.modal', () => {
     restartGame();
 });
 

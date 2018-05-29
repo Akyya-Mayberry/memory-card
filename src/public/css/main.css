@@ -16,10 +16,6 @@ body {
     padding: 0;
 }
 
-body {
-    font-family: 'Coda', cursive;
-}
-
 .container {
     display: flex;
     justify-content: center;
@@ -27,8 +23,15 @@ body {
     flex-direction: column;
 }
 
+.in-background {
+    color: red;
+    opacity: 0.3;
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+}
+
 h1 {
-    font-family: 'Open Sans', sans-serif;
+    /* font-family: 'Open Sans', sans-serif; */
     font-weight: 300;
 }
 
@@ -97,9 +100,13 @@ h1 {
     margin: 0 5px 0 0;
 }
 
-.score-panel .stars li {
+section.score-panel > ul > li {
     list-style: none;
     display: inline-block;
+}
+
+section.score-panel > ul > li > i {
+    color: goldenrod;
 }
 
 .score-panel .restart {
@@ -114,3 +121,11 @@ h1 {
     margin-left: 15px;
     width: 150px;
 }
+
+
+
+/* 
+    TODO: 
+    Card icons should display in center of card but it isn't"
+*/
+

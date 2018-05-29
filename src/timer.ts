@@ -19,6 +19,14 @@ class Timer {
         this.stopTimer();
     }
 
+    public getCurrentTime = () => {
+        const s = this.seconds < 10 ? `0${this.seconds}` : `${this.seconds}`;
+        const h = this.hours < 10 ? `0${this.hours}` : `${this.hours}`;
+        const m = this.minutes < 10 ? `0${this.minutes}` : `${this.minutes}`;
+
+        return `${h}:${m}:${s}`;
+    }
+
     public reset = () => {
         this.resetTimer();
     }
