@@ -231,6 +231,37 @@ const getStats = () => {
 };
 
 /**
+ * Updates ratings in score panel based on current time
+ */
+const rate = () => {
+    const time = timer.getCurrentTime().split(':').join('');
+
+    let stars = document.querySelectorAll('section.score-panel > ul > li > i');
+
+    if (time < '000036') {
+        for (const star of stars) {
+            star.style.color = 'goldenrod';
+        }
+    } else if (time < '000051') {
+        stars[2].style.color = 'gainsboro';
+    } else if (time < '000100') {
+        stars[2].style.color = 'gainsboro';
+        stars[1].style.color = 'gainsboro';
+    } else {
+        for (const star of stars) {
+            star.style.color = 'gainsboro';
+        }
+    }
+
+    /*
+        TODO: Signal time points - since rating is based on time
+        and not move count, ratings should be updated when certain
+        time intervals hit. Send out events when time is over 30 seconds
+        etc so ratings will be updated then.
+    */
+};
+
+/**
  * Celebrate user winning card game
  */
 const celebrate = () => {
@@ -272,6 +303,14 @@ const restartGame = () => {
     // for (const e of elements) {
     //     e.classList.remove(...['match', 'open', 'show']);
     // }
+
+    // Reset score panel
+    document.getElementsByClassName('moves')[0].textContent = moves;
+
+    let stars = document.querySelectorAll('section.score-panel > ul > li > i');
+    for (const star of stars) {
+        star.style.color = 'goldenrod';
+    }
 
     // Remove the board
     const currentBoard = document.getElementById('deck');
@@ -316,6 +355,8 @@ const processMove = (event: any) => {
     } else {
         failMatch();
     }
+
+    rate();
 
     /*
         TODO: consider event propagation
