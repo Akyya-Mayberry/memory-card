@@ -48,8 +48,8 @@ const makeCards = (t: ITheme) => {
 
 /**
  * Randomize position of elements in an array
- * Shuffle function from http://stackoverflow.com/a/2450976
- * updated to es6
+ * Shuffle function from http://stackoverflow.com/a/2450976.
+ * Updated to es6
  * @param any
  */
 const shuffle = (array: any[]) => {
@@ -110,7 +110,7 @@ const isFlippable = (event: any) => {
 };
 
 /**
- * Takes a card and flip it in UI and add it to faceup cards
+ * Flips a card in the UI and add it to faceup cards
  * @param card
  */
 const faceCardUp = (c: Card) => {
@@ -159,7 +159,7 @@ const updateFaceUpCards = (action: FlippedCardsState, card?: Card) => {
 };
 
 /**
- * Determine if cards in the facedup list of cards match
+ * Determine if card matches a card in the faced up list of cards match
  * @param card2
  */
 const isMatch = (card2: Card) => {
@@ -239,6 +239,7 @@ const rate = () => {
 
     let stars = document.querySelectorAll('section.score-panel > ul > li > i');
 
+    // Currently rating is based on time only
     if (time < '000036') {
         for (const star of stars) {
             star.style.color = 'goldenrod';
@@ -258,7 +259,7 @@ const rate = () => {
         TODO: Signal time points - since rating is based on time
         and not move count, ratings should be updated when certain
         time intervals hit. Send out events when time is over 30 seconds
-        etc so ratings will be updated then.
+        etc so ratings will be updated then. Needs refactoring.
     */
 };
 
@@ -270,7 +271,6 @@ const celebrate = () => {
     isTimerRunning = false;
 
     // Generate stats
-
     gameStats.textContent = getStats();
 
     congratsModal.modal('show');
@@ -306,6 +306,7 @@ const restartGame = () => {
     // }
 
     // Reset score panel
+
     document.getElementsByClassName('moves')[0].textContent = moves;
 
     const element = document.getElementsByClassName('themes')[0];
