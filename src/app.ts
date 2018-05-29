@@ -5,13 +5,14 @@ import { Timer } from './timer';
 
 const container = document.getElementById('container');
 const restart = document.getElementById('restart');
+const themeSelector = document.getElementsByClassName('themes')[0];
 const congratsModal = $('#congratsModal');
 const starSelector = 'section.score-panel > ul > li > i';
 const gameStats = document.getElementById('game-stats');
 const facedUpCards: Set<Card> = new Set([]);
-const theme = udacityTheme;
-const gameSize = theme.icons.length;
 const timer = new Timer();
+let theme = udacityTheme;
+let gameSize = theme.icons.length;
 let isTimerRunning = false;
 let matches = 0;
 let moves = 0;
@@ -98,7 +99,7 @@ const isFlippable = (event: any) => {
         event === undefined ||
         event.target === null ||
         event.target.classList.contains('match') ||
-        event.target.classList.contains('show') ||
+        event.target.classList.contains('reveal') ||
         event.target.nodeName !== 'LI' ||
         facedUpCards.size > 1) {
 
@@ -307,6 +308,9 @@ const restartGame = () => {
     // Reset score panel
     document.getElementsByClassName('moves')[0].textContent = moves;
 
+    const element = document.getElementsByClassName('themes')[0];
+    element.disabled = false;
+
     let stars = document.querySelectorAll('section.score-panel > ul > li > i');
     for (const star of stars) {
         star.style.color = 'goldenrod';
@@ -332,7 +336,7 @@ const restartGame = () => {
  */
 const processMove = (event: any) => {
     const target = event.target;
-    const index = target.getAttribute('data-icon').split('-')[2];
+    const index = target.getAttribute('data-icon').split('-').slice(-2)[0];
 
     const newCard = new Card(
         theme.icons[index],
@@ -372,6 +376,8 @@ container.addEventListener('click', (e: Event) => {
     if (!isTimerRunning) {
         timer.start(new Date());
         isTimerRunning = true;
+        const element = document.getElementsByClassName('themes')[0];
+        element.setAttribute('disabled', 'true');
     }
 
     processMove(e);
@@ -385,7 +391,24 @@ $('#congratsModal').on('hidden.bs.modal', () => {
     restartGame();
 });
 
+themeSelector.addEventListener('change', (e) => {
+    theme = e.target.value === 'Udacity Theme' ? udacityTheme : topTechTheme;
+    restartGame();
+});
+
 //////////////////////////
 
-const newDeck: Card[] = shuffle(makeCards(theme));
-buildGameBoard(newDeck);
+const init = () => {
+    const newDeck: Card[] = shuffle(makeCards(theme));
+    buildGameBoard(newDeck);
+
+    const udacity = document.createElement('option');
+    udacity.textContent = "Udacity Theme";
+    themeSelector.appendChild(udacity);
+
+    const tech = document.createElement('option');
+    tech.textContent = "Top Tech Theme"
+    themeSelector.appendChild(tech);
+};
+
+init();

@@ -35,20 +35,20 @@ class Card {
 
     public faceUp = () => {
         this.classes.add('open');
-        this.classes.add('show');
+        this.classes.add('reveal');
 
         const e: Element = document.querySelector(`li[data-icon*="${this.dataAttr}"`)!;
 
-        e.classList.add(...['open', 'show']);
+        e.classList.add(...['open', 'reveal']);
     }
 
     public faceDown = () => {
         this.classes.delete('open');
-        this.classes.delete('show');
+        this.classes.delete('reveal');
 
         const e: Element = document.querySelector(`li[data-icon*="${this.dataAttr}"`)!;
 
-        e.classList.remove(...['open', 'show']);
+        e.classList.remove(...['open', 'reveal']);
     }
 }
 

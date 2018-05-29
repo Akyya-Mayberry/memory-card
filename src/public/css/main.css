@@ -73,7 +73,7 @@ h1 {
     cursor: default;
 }
 
-.deck .card.show {
+.deck .card.reveal {
     font-size: 33px;
 }
 
@@ -121,8 +121,6 @@ section.score-panel > ul > li > i {
     margin-left: 15px;
     width: 150px;
 }
-
-
 
 /* 
     TODO: 
