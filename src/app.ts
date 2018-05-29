@@ -6,6 +6,7 @@ import { Timer } from './timer';
 const container = document.getElementById('container');
 const restart = document.getElementById('restart');
 const congratsModal = $('#congratsModal');
+const starSelector = 'section.score-panel > ul > li > i';
 const gameStats = document.getElementById('game-stats');
 const facedUpCards: Set<Card> = new Set([]);
 const theme = udacityTheme;
@@ -74,6 +75,7 @@ const buildGameBoard = (deck: Card[]) => {
         const frag = document.createDocumentFragment();
         const ul = document.createElement('ul');
         ul.classList.add('deck');
+        ul.setAttribute('id', 'deck');
 
         // Create DOM elements from the cards
         for (const card of deck) {
@@ -265,11 +267,16 @@ const restartGame = () => {
     moves = 0;
 
     // Go through each card in the dom and reset classes
-    const elements = document.querySelectorAll('.card');
+    // const elements = document.querySelectorAll('.card');
 
-    for (const e of elements) {
-        e.classList.remove(...['match', 'open', 'show']);
-    }
+    // for (const e of elements) {
+    //     e.classList.remove(...['match', 'open', 'show']);
+    // }
+
+    const currentBoard = document.getElementById('deck');
+    currentBoard.parentNode.removeChild(currentBoard);
+    const deck: Card[] = shuffle(makeCards(theme));
+    buildGameBoard(deck);
 
     /*
         TODO: Consider optimization - the for of loop above

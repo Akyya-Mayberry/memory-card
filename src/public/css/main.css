@@ -100,9 +100,13 @@ h1 {
     margin: 0 5px 0 0;
 }
 
-#container > section.score-panel > ul > li {
+section.score-panel > ul > li {
     list-style: none;
     display: inline-block;
+}
+
+section.score-panel > ul > li > i {
+    color: goldenrod;
 }
 
 .score-panel .restart {
@@ -117,6 +121,8 @@ h1 {
     margin-left: 15px;
     width: 150px;
 }
+
+
 
 /* 
     TODO: 
