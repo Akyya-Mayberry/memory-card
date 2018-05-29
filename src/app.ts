@@ -273,8 +273,11 @@ const restartGame = () => {
     //     e.classList.remove(...['match', 'open', 'show']);
     // }
 
+    // Remove the board
     const currentBoard = document.getElementById('deck');
     currentBoard.parentNode.removeChild(currentBoard);
+
+    // Recreate
     const deck: Card[] = shuffle(makeCards(theme));
     buildGameBoard(deck);
 
@@ -305,6 +308,7 @@ const processMove = (event: any) => {
 
     // Attempting to make a match
     moves += 1;
+    document.getElementsByClassName('moves')[0].textContent = moves;
 
     if (isMatch(newCard)) {
         confirmMatch(newCard);
