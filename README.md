@@ -1,6 +1,8 @@
 # Memory Card Game
 Udacity Frontend Nanodegree Project #2
-
+  
+[live preview of game](https://hollywoodno.github.io/memory-card/)
+  
 Classic memory card game. Players choose a card theme and try to match all pairs of cards on the gameboard. Each move, a player flip over a pair of cards and each move is tracked. Once all pairs are matched, the player wins. A player is rated 1-3 stars depending on how long it takes for to match all cards.
 
 ## Build
